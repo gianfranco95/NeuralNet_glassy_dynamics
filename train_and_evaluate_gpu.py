@@ -15,44 +15,33 @@ def build_and_compile_model(norm,size_out):
         norm,
         layers.Dense(16, activation='relu',kernel_regularizer=regularizers.l2(1e-2)),
         layers.Dense(16, activation='relu',kernel_regularizer=regularizers.l2(1e-2)),
+        layers.Dropout(.1, input_shape=(16,)),
         layers.Dense(16, activation='relu',kernel_regularizer=regularizers.l2(1e-2)),
-        layers.Dense(16, activation='relu',kernel_regularizer=regularizers.l2(1e-2)),
-        # layers.Dropout(.1, input_shape=(16,)),
-        layers.Dense(15, activation='relu',kernel_regularizer=regularizers.l2(1e-2)),
-        layers.Dense(15, activation='relu',kernel_regularizer=regularizers.l2(1e-2)),
-        layers.Dense(15, activation='relu',kernel_regularizer=regularizers.l2(1e-2)),
-        layers.Dense(15, activation='relu',kernel_regularizer=regularizers.l2(1e-2)),
-        layers.Dense(15, activation='relu',kernel_regularizer=regularizers.l2(1e-2)),
-        layers.Dense(15, activation='relu',kernel_regularizer=regularizers.l2(1e-2)),
-        layers.Dense(15, activation='relu',kernel_regularizer=regularizers.l2(1e-2)),
-        layers.Dense(15, activation='relu',kernel_regularizer=regularizers.l2(1e-2)),
         layers.Dense(size_out)
     ])
-    
+
     model.compile(loss='mean_squared_error',
                   optimizer=tf.keras.optimizers.Adam(0.0001))
     return model
 
 
 def setting_dataframe(df1,df2,scaling=True,popping1='cage_escape_time',otherpop=None):
-    #popping di una variabile indesiderata
     if popping1:
         df1.pop(popping1)
     if otherpop:
         for x in list(otherpop):
             df1.pop(x)
-    
-    #scaling del dataframe target
+
+    #scaling target dataframe
     disp_scaler= StandardScaler()
     disp_scaler.fit(df2)
     cols=df2.columns
     if scaling:
         df2=pd.DataFrame(disp_scaler.transform(df2),columns=cols)
-    
+
     #join dataset features e target
     ldf=df1.join(df2)
-    
-    #creo i target/feature test/train
+
     train_dataset = ldf.sample(frac=0.8, random_state=2)
     test_dataset = ldf.drop(train_dataset.index)
     train_features = train_dataset.drop(train_dataset.columns[-10:],axis=1)
@@ -132,8 +121,6 @@ def main():
 	except RuntimeError as e:
 		print(e)
 
-
-######################
 
 
 if __name__ == "__main__":
